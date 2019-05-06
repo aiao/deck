@@ -178,7 +178,10 @@ func GetAllServices(client *kong.Client, config *Config) ([]*kong.Service, error
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	if config != nil {
+		println("Cluster2:" + config.Cluster)
 		opt.Cluster = config.Cluster
+	} else {
+		println("Cluster3:nil")
 	}
 	for {
 		s, opt, err := client.Services.List(nil, opt)
