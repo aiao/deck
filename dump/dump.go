@@ -14,7 +14,7 @@ type Config struct {
 
 // GetState queries Kong for all entities using client and
 // constructs a structered state.
-func GetState(client *kong.Client, config Config) (*state.KongState, error) {
+func GetState(client *kong.Client, config *Config) (*state.KongState, error) {
 	raw, err := Get(client, config)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
-func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
+func Get(client *kong.Client, config *Config) (*utils.KongRawState, error) {
 
 	var state utils.KongRawState
 	services, err := GetAllServices(client, config)
@@ -173,7 +173,7 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 }
 
 // GetAllServices queries Kong for all the services using client.
-func GetAllServices(client *kong.Client, config Config) ([]*kong.Service, error) {
+func GetAllServices(client *kong.Client, config *Config) ([]*kong.Service, error) {
 	var services []*kong.Service
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
@@ -194,7 +194,7 @@ func GetAllServices(client *kong.Client, config Config) ([]*kong.Service, error)
 }
 
 // GetAllRoutes queries Kong for all the routes using client.
-func GetAllRoutes(client *kong.Client, config Config) ([]*kong.Route, error) {
+func GetAllRoutes(client *kong.Client, config *Config) ([]*kong.Route, error) {
 	var routes []*kong.Route
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
