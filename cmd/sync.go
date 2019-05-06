@@ -26,7 +26,7 @@ to get Kong's state in sync with the input state.`,
 		if err != nil {
 			return err
 		}
-		currentState, err := dump.GetState(client)
+		currentState, err := dump.GetState(client, nil)
 		if err != nil {
 			return err
 		}

@@ -29,7 +29,7 @@ that will be created or updated or deleted.
 		if err != nil {
 			return err
 		}
-		currentState, err := dump.GetState(client)
+		currentState, err := dump.GetState(client, nil)
 		if err != nil {
 			return err
 		}

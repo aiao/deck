@@ -7,10 +7,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Config can be used to filter cluster entities
+type Config struct {
+	Cluster string
+}
+
 // GetState queries Kong for all entities using client and
 // constructs a structered state.
-func GetState(client *kong.Client) (*state.KongState, error) {
-	raw, err := Get(client)
+func GetState(client *kong.Client, config Config) (*state.KongState, error) {
+	raw, err := Get(client, config)
 	if err != nil {
 		return nil, err
 	}
@@ -85,20 +90,22 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 		if p.Service != nil {
 			s, err := kongState.Services.Get(*p.Service.ID)
 			if err != nil {
-				return nil, errors.Wrapf(err,
-					"looking up service '%v' for plugin '%v'",
-					*p.Service.ID, *p.Name)
+				// return nil, errors.Wrapf(err,
+				// 	"looking up service '%v' for plugin '%v'",
+				// 	*p.Service.ID, *p.Name)
+			} else {
+				p.Service = s.DeepCopy()
 			}
-			p.Service = s.DeepCopy()
 		}
 		if p.Route != nil {
 			r, err := kongState.Routes.Get(*p.Route.ID)
 			if err != nil {
-				return nil, errors.Wrapf(err,
-					"looking up route '%v' for plugin '%v'",
-					*p.Route.ID, *p.Name)
+				// return nil, errors.Wrapf(err,
+				// 	"looking up route '%v' for plugin '%v'",
+				// 	*p.Route.ID, *p.Name)
+			} else {
+				p.Route = r.DeepCopy()
 			}
-			p.Route = r.DeepCopy()
 		}
 		err := kongState.Plugins.Add(state.Plugin{Plugin: *p})
 		if err != nil {
@@ -110,17 +117,17 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
-func Get(client *kong.Client) (*utils.KongRawState, error) {
+func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 
 	var state utils.KongRawState
-	services, err := GetAllServices(client)
+	services, err := GetAllServices(client, config)
 	if err != nil {
 		return nil, err
 	}
 
 	state.Services = services
 
-	routes, err := GetAllRoutes(client)
+	routes, err := GetAllRoutes(client, config)
 	if err != nil {
 		return nil, err
 	}
@@ -166,10 +173,13 @@ func Get(client *kong.Client) (*utils.KongRawState, error) {
 }
 
 // GetAllServices queries Kong for all the services using client.
-func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
+func GetAllServices(client *kong.Client, config Config) ([]*kong.Service, error) {
 	var services []*kong.Service
 	opt := new(kong.ListOpt)
-	opt.Size = 9998
+	opt.Size = 1000
+	if config != nil {
+		opt.Cluster = config.Cluster
+	}
 	for {
 		s, opt, err := client.Services.List(nil, opt)
 		if err != nil {
@@ -184,10 +194,13 @@ func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
 }
 
 // GetAllRoutes queries Kong for all the routes using client.
-func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
+func GetAllRoutes(client *kong.Client, config Config) ([]*kong.Route, error) {
 	var routes []*kong.Route
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
+	if config != nil {
+		opt.Cluster = config.Cluster
+	}
 	for {
 		s, opt, err := client.Routes.List(nil, opt)
 		if err != nil {

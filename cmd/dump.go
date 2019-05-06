@@ -26,7 +26,7 @@ configure Kong.`,
 			return err
 		}
 
-		ks, err := dump.GetState(client)
+		ks, err := dump.GetState(client, nil)
 		if err != nil {
 			return err
 		}

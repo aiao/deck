@@ -38,7 +38,7 @@ By default, this command will ask for a confirmation prompt.`,
 		if err != nil {
 			return err
 		}
-		state, err := dump.Get(client)
+		state, err := dump.Get(client, nil)
 		if err != nil {
 			return err
 		}
