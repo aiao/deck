@@ -169,7 +169,7 @@ func Get(client *kong.Client) (*utils.KongRawState, error) {
 func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
 	var services []*kong.Service
 	opt := new(kong.ListOpt)
-	opt.Size = 9999
+	opt.Size = 9998
 	for {
 		s, opt, err := client.Services.List(nil, opt)
 		if err != nil {
